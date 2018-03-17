@@ -49,7 +49,7 @@ FROM (SELECT store || EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saleda
       WHERE stype = 'P'
             AND OREPLACE(EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saledate), ' ', '') not like '%82005'
       GROUP BY store_month_year
-      HAVING num >= 20) AS cleaned_trnsact
+      HAVING num >= 20) AS cleaned_trnsact;
 
 
 # Exercise 5:
@@ -66,7 +66,7 @@ FROM (SELECT store || EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saleda
       HAVING num >= 20) AS cleaned_trnsact
 JOIN store_msa
 ON cleaned_trnsact.store = store_msa.store
-GROUP BY edu
+GROUP BY edu;
 
 
 # Exercise 6:
@@ -81,20 +81,6 @@ FROM (SELECT store || EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saleda
 JOIN (SELECT TOP 5 state, city, store, msa_income
       FROM store_msa
       ORDER BY msa_income DESC) AS high_income
-ON cleaned_trnsact.store = high_income.store
-GROUP BY state, city, cleaned_trnsact.store;
-
-SELECT state, city, cleaned_trnsact.store, SUM(tot_rev) / SUM(num) AS avg_daily_rev, AVG(msa_income) AS income
-FROM (SELECT store || EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saledate) AS store_month_year,
-             COUNT(DISTINCT saledate) AS num, SUM(amt) AS tot_rev, store
-      FROM trnsact
-      WHERE stype = 'P' 
-            AND OREPLACE(EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saledate), ' ', '') not like '%82005'
-      GROUP BY store_month_year, store
-      HAVING num >= 20) AS cleaned_trnsact
-JOIN (SELECT TOP 5 state, city, store, msa_income
-      FROM store_msa
-      ORDER BY msa_income ASC) AS high_income
 ON cleaned_trnsact.store = high_income.store
 GROUP BY state, city, cleaned_trnsact.store;
 
@@ -196,7 +182,7 @@ FROM (SELECT store, EXTRACT (MONTH FROM saledate) AS months, SUM(amt) AS month_r
             AND OREPLACE(EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saledate), ' ', '') not like '%82005'
       GROUP BY store, months
       HAVING COUNT(DISTINCT saledate) >= 20
-      QUALIFY rev_rank = 1) AS sto_mth
+      QUALIFY rev_rank = 1) AS sto_mth;
 
 SELECT COUNT(CASE months WHEN 1 THEN store END) AS Jan_cnt,
        COUNT(CASE months WHEN 2 THEN store END) AS Feb_cnt,
@@ -217,4 +203,4 @@ FROM (SELECT store, EXTRACT (MONTH FROM saledate) AS months, SUM(amt) / COUNT(DI
             AND OREPLACE(EXTRACT (MONTH FROM saledate) || EXTRACT (YEAR FROM saledate), ' ', '') not like '%82005'
       GROUP BY store, months
       HAVING COUNT(DISTINCT saledate) >= 20
-      QUALIFY rev_rank = 1) AS sto_mth
+      QUALIFY rev_rank = 1) AS sto_mth;
